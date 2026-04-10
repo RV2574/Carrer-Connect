@@ -379,7 +379,7 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
 // --- Main Component ---
 export default function App() {
   // --- State ---
-  const [view, setView] = useState<'home' | 'login' | 'signup' | 'dashboard' | 'post-job' | 'job-details' | 'applicants'>('home');
+ const [view, setView] = useState<'home' | 'login' | 'signup' | 'dashboard' | 'post-job' | 'job-details' | 'applicants' | 'about'>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -608,7 +608,7 @@ const viewApplicants = (job: Job) => {
             <div className="bg-indigo-600 p-2 rounded-lg mr-2">
               <Briefcase className="text-white w-6 h-6" />
             </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">Carrer-Connect</span>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">Career-Connect</span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
@@ -616,6 +616,12 @@ const viewApplicants = (job: Job) => {
             {currentUser && (
               <button onClick={() => setView('dashboard')} className={`text-sm font-medium ${view === 'dashboard' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'}`}>Dashboard</button>
             )}
+            <button 
+  onClick={() => setView('about')} 
+  className={`text-sm font-medium ${view === 'about' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'}`}
+>
+  About
+</button>
             {(currentUser?.role === 'lister' || currentUser?.role === 'admin') && (
               <button onClick={() => setView('post-job')} className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center">
                 <PlusCircle className="w-4 h-4 mr-2" />
@@ -755,7 +761,118 @@ const viewApplicants = (job: Job) => {
               </div>
             </motion.div>
           )}
+{view === 'about' && (
+  <motion.div
+    key="about"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="max-w-6xl mx-auto"
+  >
 
+    {/* 🔥 HERO */}
+    <div className="text-center mb-24 relative">
+      <div className="absolute inset-0 -z-10 blur-3xl opacity-20 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+      <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
+        Discover Your Future with{" "}
+        <span className="bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+          Career-Connect
+        </span>
+      </h1>
+
+      <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+        A powerful platform connecting ambitious individuals with top companies. 
+        Smarter hiring. Faster applications. Better careers.
+      </p>
+    </div>
+
+    {/* 🔥 STATS */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24">
+      {[
+        { label: "Jobs Posted", value: jobs.length, color: "from-indigo-500 to-indigo-700" },
+        { label: "Applications", value: applications.length, color: "from-purple-500 to-purple-700" },
+        { label: "Companies", value: "50+", color: "from-pink-500 to-pink-700" },
+        { label: "Users", value: "100+", color: "from-blue-500 to-blue-700" }
+      ].map((stat, i) => (
+        <div 
+          key={i} 
+          className="rounded-2xl p-[1px] bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200"
+        >
+          <div className="bg-white p-6 rounded-2xl text-center hover:scale-105 transition">
+            <h2 className={`text-3xl font-extrabold bg-gradient-to-r ${stat.color} text-transparent bg-clip-text`}>
+              {stat.value}
+            </h2>
+            <p className="text-gray-500 text-sm mt-1">{stat.label}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* 🔥 FEATURES */}
+    <div className="grid md:grid-cols-3 gap-8 mb-24">
+      
+      <div className="bg-gradient-to-br from-indigo-50 to-white p-8 rounded-3xl border hover:shadow-2xl transition group">
+        <div className="text-4xl mb-4">🚀</div>
+        <h3 className="font-bold text-lg mb-2 text-indigo-600">
+          Smart Job Search
+        </h3>
+        <p className="text-sm text-gray-500">
+          Filter jobs instantly with advanced search and location-based results.
+        </p>
+      </div>
+
+      <div className="bg-gradient-to-br from-purple-50 to-white p-8 rounded-3xl border hover:shadow-2xl transition group">
+        <div className="text-4xl mb-4">⚡</div>
+        <h3 className="font-bold text-lg mb-2 text-purple-600">
+          Quick Apply System
+        </h3>
+        <p className="text-sm text-gray-500">
+          Apply in seconds and manage all your applications seamlessly.
+        </p>
+      </div>
+
+      <div className="bg-gradient-to-br from-pink-50 to-white p-8 rounded-3xl border hover:shadow-2xl transition group">
+        <div className="text-4xl mb-4">🛠</div>
+        <h3 className="font-bold text-lg mb-2 text-pink-600">
+          Powerful Admin Panel
+        </h3>
+        <p className="text-sm text-gray-500">
+          Control, edit, and monitor job listings with advanced admin tools.
+        </p>
+      </div>
+
+    </div>
+
+    {/* 🔥 MISSION */}
+    <div className="relative mb-24">
+      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-10 blur-2xl rounded-3xl"></div>
+
+      <div className="bg-white p-12 rounded-3xl border text-center relative">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          To revolutionize hiring by making job discovery smarter, faster, and more accessible 
+          for everyone — from freshers to professionals.
+        </p>
+      </div>
+    </div>
+
+    {/* 🔥 CTA */}
+    <div className="text-center">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6">
+        Your Dream Job is Just One Click Away 🚀
+      </h2>
+
+      <button 
+        onClick={() => setView('home')}
+        className="bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:scale-105 transition-all"
+      >
+        Explore Jobs
+      </button>
+    </div>
+
+  </motion.div>
+)}
           {/* --- Login View --- */}
           {view === 'login' && (
             <motion.div 
@@ -1220,10 +1337,12 @@ const viewApplicants = (job: Job) => {
               <div className="bg-indigo-600 p-2 rounded-lg mr-2">
                 <Briefcase className="text-white w-5 h-5" />
               </div>
-              <span className="text-lg font-bold text-gray-900 tracking-tight">Carrer-Connect</span>
+              <span className="text-lg font-bold text-gray-900 tracking-tight">Career-Connect</span>
             </div>
             <div className="flex space-x-8 text-sm font-medium text-gray-500">
-              <a href="#" className="hover:text-indigo-600 transition-colors">About Us</a>
+             <button onClick={() => setView('about')} className="hover:text-indigo-600 transition-colors">
+  About Us
+</button>
               <a href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-indigo-600 transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
