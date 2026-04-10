@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
+import { QRCodeCanvas } from "qrcode.react";
 import { 
   Search, 
   MapPin, 
@@ -933,7 +934,6 @@ const INITIAL_JOBS: Job[] = [
   postedAt: new Date().toISOString()
 }
 ];
-
 // --- Components ---
 const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDetails, onViewApplicants, onDelete, onEdit }: { 
   job: Job, 
@@ -1049,8 +1049,9 @@ export default function App() {
   const [filterType, setFilterType] = useState<'All' | 'Private' | 'Government'>('All');
   const [filterLocation, setFilterLocation] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const [messages, setMessages] = useState([
-  { text: "Hi 👋 I'm your assistant!", sender: "bot" }
+  { text: "Hi 👋 I'm Zora, tell me how can i assist you!", sender: "bot" }
 ]);
 
   // --- Persistence ---
@@ -1100,112 +1101,148 @@ useEffect(() => {
 
 const handleChat = (input: string) => {
   const msg = input.toLowerCase();
-  let reply = "Sorry, I didn't understand.";
 
-  // 🔍 JOB ROLE DETECTION
-const jobRoles = [
-  // TECH
-  "software engineer",
-  "frontend developer",
-  "backend developer",
-  "full stack developer",
-  "data analyst",
-  "data scientist",
-  "cloud engineer",
-  "devops engineer",
-  "qa engineer",
+  let reply = `❌ I didn't understand.
 
-  // BUSINESS / CORPORATE
-  "accountant",
-  "hr recruiter",
-  "sales executive",
-  "marketing",
-  "product manager",
-  "customer support",
-  "insurance advisor",
+👉 Try typing:
+• "Software engineer jobs"
+• "Government jobs in Delhi"
+• "Private jobs in Mumbai"
+• "Clerk government jobs"
+• "Jobs in Jaipur"
+• "Government job links"`;
 
-  // DESIGN / CONTENT
-  "designer",
-  "ui ux designer",
-  "graphic designer",
-  "content writer",
-  "photographer",
+  // =======================
+  // 🔗 OFFICIAL GOV LINKS
+  // =======================
+  const govLinks = [
+    "https://www.ncs.gov.in/",
+    "https://services.india.gov.in/",
+    "https://ssc.nic.in/",
+    "https://www.upsc.gov.in/"
+  ];
 
-  // HEALTHCARE
-  "nurse",
-  "pharmacist",
-  "lab technician",
+  // =======================
+  // 🎯 JOB ROLES
+  // =======================
+  const jobRoles = [
+    "software engineer","frontend developer","backend developer","full stack developer",
+    "data analyst","data scientist","cloud engineer","devops engineer","qa engineer",
+    "accountant","hr recruiter","sales executive","marketing","product manager",
+    "customer support","insurance advisor","designer","ui ux designer","graphic designer",
+    "content writer","photographer","nurse","pharmacist","lab technician","teacher",
+    "driver","delivery executive","electrician","fitness trainer","store manager",
+    "hotel manager","event coordinator","mechanical engineer","civil engineer",
+    "clerk","police","constable","sub inspector","bank po","railway","forest guard",
+    "municipal officer","postal","revenue officer","tax assistant","fireman",
+    "librarian","transport inspector","health inspector","village development officer"
+  ];
 
-  // EDUCATION
-  "teacher",
-
-  // FIELD / SERVICE
-  "driver",
-  "delivery executive",
-  "electrician",
-  "fitness trainer",
-
-  // MANAGEMENT
-  "store manager",
-  "hotel manager",
-  "event coordinator",
-
-  // ENGINEERING NON-TECH
-  "mechanical engineer",
-  "civil engineer",
-
-  // GOVERNMENT
-  "clerk",
-  "police",
-  "constable",
-  "sub inspector",
-  "bank po",
-  "railway",
-  "forest guard",
-  "municipal officer",
-  "postal",
-  "revenue officer",
-  "tax assistant",
-  "fireman",
-  "librarian",
-  "transport inspector",
-  "health inspector",
-  "village development officer"
-];
+  // =======================
+  // 📍 CITY DETECTION
+  // =======================
+  const cities = [
+    "delhi","mumbai","bangalore","jaipur","pune","chennai",
+    "hyderabad","lucknow","patna","indore","bhopal","kolkata"
+  ];
 
   const matchedRole = jobRoles.find(role => msg.includes(role));
+  const matchedCity = cities.find(city => msg.includes(city));
 
   // =======================
-  // 🎯 ROLE-BASED SEARCH
+  // 🧠 HELP COMMAND
   // =======================
-  if (matchedRole) {
-    setSearchQuery(matchedRole);
-    setView("home");
-    reply = `Showing jobs for "${matchedRole}".`;
+  if (msg.includes("help")) {
+    reply = `🧠 How to use:
+
+🔹 Role:
+"Software engineer jobs"
+
+🔹 City:
+"Jobs in Delhi"
+
+🔹 Government:
+"Clerk government jobs"
+
+🔹 Combined:
+"Private jobs in Mumbai"
+
+🔗 For official sites:
+Type "government job links"`;
   }
 
   // =======================
-  // 🎯 FILTERS
+  // 🔥 GOV LINKS
+  // =======================
+  else if (msg.includes("government") && msg.includes("link")) {
+    reply = `🔗 Official Government Job Websites:
+${govLinks.join("\n")}`;
+  }
+
+  // =======================
+  // 🎯 ROLE + CITY + GOV
+  // =======================
+  else if (matchedRole && matchedCity && msg.includes("government")) {
+    setSearchQuery(matchedRole);
+    setFilterType("Government");
+    setView("home");
+    reply = `Showing government ${matchedRole} jobs in ${matchedCity}.
+
+💡 Try: "${matchedRole} jobs in ${matchedCity}"`;
+  }
+
+  // =======================
+  // 🎯 ROLE + CITY
+  // =======================
+  else if (matchedRole && matchedCity) {
+    setSearchQuery(matchedRole);
+    setView("home");
+    reply = `Showing ${matchedRole} jobs in ${matchedCity}.
+
+💡 Tip: You can also try "government ${matchedRole} jobs"`;
+  }
+
+  // =======================
+  // 🎯 ROLE ONLY
+  // =======================
+  else if (matchedRole) {
+    setSearchQuery(matchedRole);
+    setView("home");
+    reply = `Showing jobs for "${matchedRole}".
+
+💡 Try adding city: "${matchedRole} jobs in Delhi"`;
+  }
+
+  // =======================
+  // 🎯 CITY ONLY
+  // =======================
+  else if (matchedCity) {
+    setSearchQuery(matchedCity);
+    setView("home");
+    reply = `Showing jobs in ${matchedCity}.
+
+💡 Try adding role: "Software jobs in ${matchedCity}"`;
+  }
+
+  // =======================
+  // 🎯 TYPE FILTER
   // =======================
   else if (msg.includes("private")) {
     setFilterType("Private");
     setView("home");
-    reply = "Showing private jobs.";
+    reply = `Showing private jobs.
+
+💡 Try: "Private jobs in Mumbai"`;
   } 
   else if (msg.includes("government")) {
     setFilterType("Government");
     setView("home");
-    reply = "Showing government jobs.";
-  } 
+    reply = `Showing government jobs.
 
-  // =======================
-  // 🎯 COMBINED SEARCH
-  // =======================
-  else if (msg.includes("software") && msg.includes("private")) {
-    setSearchQuery("software");
-    setFilterType("Private");
-    setView("home");
-    reply = "Showing private software jobs.";
+🔗 You can also check:
+${govLinks[0]}
+
+💡 Try: "Government jobs in Delhi"`;
   }
 
   // =======================
@@ -1218,13 +1255,17 @@ const jobRoles = [
   else if (msg.includes("post")) {
     setView("post-job");
     reply = "Redirecting to post job.";
-  } 
+  }
 
   // =======================
-  // 🎯 HELP
+  // 🎯 APPLY HELP
   // =======================
   else if (msg.includes("apply")) {
-    reply = "Click 'View Details' → Apply Now.";
+    reply = `📌 To apply:
+1. Click "View Details"
+2. Click "Apply Now"
+
+💡 Tip: Try searching jobs first (e.g., "Software jobs")`;
   }
 
   // =======================
@@ -1421,7 +1462,16 @@ const viewApplicants = (job: Job) => {
 >
   Roadmaps
 </button>
+  {/* 📱 QR BUTTON */}
+  <button
+    onClick={() => setShowQR(true)}
+    className="bg-white border border-gray-200 px-4 py-2 rounded-full text-sm font-medium hover:border-indigo-400 hover:text-indigo-600 transition"
+  >
+    📱 Open on Mobile
+  </button>
+
             {(currentUser?.role === 'lister' || currentUser?.role === 'admin') && (
+              
               <button onClick={() => setView('post-job')} className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center">
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Post a Job
@@ -1674,6 +1724,41 @@ const viewApplicants = (job: Job) => {
   </motion.div>
 )}
 
+// QR code 
+{showQR && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+    {/* Modal */}
+    <div className="bg-white rounded-3xl p-6 w-80 text-center shadow-2xl relative">
+
+      {/* Close */}
+      <button
+        onClick={() => setShowQR(false)}
+        className="absolute top-3 right-3 text-gray-400 hover:text-black text-lg"
+      >
+        ✕
+      </button>
+
+      <h3 className="text-lg font-bold text-gray-800 mb-2">
+        Open on Mobile 📱
+      </h3>
+
+      <p className="text-xs text-gray-500 mb-4">
+        Scan to access Career-Connect
+      </p>
+
+      <div className="flex justify-center">
+        <div className="bg-white p-3 rounded-xl shadow">
+          <QRCodeCanvas
+            value="https://carrer-connect-woad.vercel.app/"
+            size={160}
+          />
+        </div>
+      </div>
+
+    </div>
+  </div>
+)}
 // Roadmap 
 {view === 'roadmaps' && (
   <motion.div
@@ -2061,7 +2146,16 @@ const viewApplicants = (job: Job) => {
                         </div>
                         <h4 className="text-lg font-bold text-gray-900">No jobs posted yet</h4>
                         <p className="text-gray-400 text-sm mb-6">Start hiring by posting your first job opening.</p>
-                        <button onClick={() => setView('post-job')} className="text-indigo-600 font-bold hover:underline">Post a Job Now</button>
+
+
+  {/* ➕ POST JOB */}
+  <button 
+    onClick={() => setView('post-job')} 
+    className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center"
+  >
+    Post a Job
+  </button>
+
                       </div>
                     )}
                   </div>
@@ -2221,7 +2315,13 @@ const viewApplicants = (job: Job) => {
 </button>
               <a href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-indigo-600 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
+<a 
+  href="https://mail.google.com/mail/?view=cm&fs=1&to=career.connect1001@gmail.com&su=Job Portal Query&body=Hello, I want to ask about..."
+  target="_blank"
+  className="hover:text-indigo-600 transition-colors"
+>
+  Contact
+</a>
             </div>
             <div className="text-sm text-gray-400">
              All rights reserved.
@@ -2240,44 +2340,85 @@ const viewApplicants = (job: Job) => {
     💬
   </button>
 
-  {/* Chat Box */}
-  {showChat && (
-    <div className="mt-3 w-80 bg-white rounded-2xl shadow-2xl border p-4">
+{/* Chat Box */}
+{showChat && (
+  <div className="mt-3 w-80 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-indigo-100 overflow-hidden">
 
-      {/* Messages */}
-      <div className="h-60 overflow-y-auto space-y-2 mb-3">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`text-sm p-2 rounded-lg ${
-              m.sender === "user"
-                ? "bg-indigo-100 text-right"
-                : "bg-gray-100"
-            }`}
-          >
-            {m.text}
-          </div>
-        ))}
+    {/* 🔵 HEADER */}
+    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm">
+          🤖
+        </div>
+        <div>
+          <p className="text-sm font-semibold">ZORA</p>
+          <p className="text-[10px] opacity-80">Career Assistant</p>
+        </div>
       </div>
+      <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
+        Online
+      </span>
+    </div>
 
-      {/* Input */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const input = e.target as any;
-          handleChat(input.msg.value);
-          input.msg.value = "";
-        }}
-      >
-        <input
-          name="msg"
-          placeholder="Ask something..."
-          className="w-full border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </form>
+    {/* 🔵 MESSAGES */}
+    <div className="h-64 overflow-y-auto space-y-3 px-3 py-4 bg-gradient-to-b from-white to-indigo-50">
+
+      {messages.map((m, i) => (
+        <div
+          key={i}
+          className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+        >
+
+          {/* BOT MESSAGE */}
+          {m.sender !== "user" && (
+            <div className="flex items-start gap-2 max-w-[75%]">
+              <div className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs">
+                🤖
+              </div>
+              <div className="bg-white border border-gray-100 shadow-sm text-gray-700 px-3 py-2 rounded-2xl text-sm">
+                {m.text}
+              </div>
+            </div>
+          )}
+
+          {/* USER MESSAGE */}
+          {m.sender === "user" && (
+            <div className="bg-indigo-600 text-white px-3 py-2 rounded-2xl text-sm max-w-[75%] shadow">
+              {m.text}
+            </div>
+          )}
+
+        </div>
+      ))}
 
     </div>
-  )}
+
+    {/* 🔵 INPUT */}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const input = e.target as any;
+        handleChat(input.msg.value);
+        input.msg.value = "";
+      }}
+      className="flex items-center gap-2 p-3 border-t bg-white"
+    >
+      <input
+        name="msg"
+        placeholder="Ask ZORA..."
+        className="flex-1 px-3 py-2 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      <button
+        type="submit"
+        className="bg-indigo-600 text-white px-3 py-2 rounded-full hover:bg-indigo-700 transition"
+      >
+        ➤
+      </button>
+    </form>
+
+  </div>
+)}
 </div>
     </div>
   );
