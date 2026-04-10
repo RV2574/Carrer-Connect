@@ -391,6 +391,10 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'All' | 'Private' | 'Government'>('All');
   const [filterLocation, setFilterLocation] = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [messages, setMessages] = useState([
+  { text: "Hi 👋 I'm your assistant!", sender: "bot" }
+]);
 
   // --- Persistence ---
   useEffect(() => {
@@ -443,6 +447,93 @@ export default function App() {
   }, [jobs, searchQuery, filterType, filterLocation]);
 
 // --- Handlers ---
+// =======================
+// ✅ SMART CHATBOT HANDLER (UPGRADED)
+// =======================
+
+const handleChat = (input: string) => {
+  const msg = input.toLowerCase();
+  let reply = "Sorry, I didn't understand.";
+
+  // 🔍 JOB ROLE DETECTION
+  const jobRoles = [
+    "software engineer",
+    "developer",
+    "frontend",
+    "backend",
+    "full stack",
+    "designer",
+    "data scientist",
+    "accountant",
+    "teacher",
+    "clerk",
+    "police",
+    "marketing"
+  ];
+
+  const matchedRole = jobRoles.find(role => msg.includes(role));
+
+  // =======================
+  // 🎯 ROLE-BASED SEARCH
+  // =======================
+  if (matchedRole) {
+    setSearchQuery(matchedRole);
+    setView("home");
+    reply = `Showing jobs for "${matchedRole}".`;
+  }
+
+  // =======================
+  // 🎯 FILTERS
+  // =======================
+  else if (msg.includes("private")) {
+    setFilterType("Private");
+    setView("home");
+    reply = "Showing private jobs.";
+  } 
+  else if (msg.includes("government")) {
+    setFilterType("Government");
+    setView("home");
+    reply = "Showing government jobs.";
+  } 
+
+  // =======================
+  // 🎯 COMBINED SEARCH
+  // =======================
+  else if (msg.includes("software") && msg.includes("private")) {
+    setSearchQuery("software");
+    setFilterType("Private");
+    setView("home");
+    reply = "Showing private software jobs.";
+  }
+
+  // =======================
+  // 🎯 NAVIGATION
+  // =======================
+  else if (msg.includes("dashboard")) {
+    setView("dashboard");
+    reply = "Opening dashboard.";
+  } 
+  else if (msg.includes("post")) {
+    setView("post-job");
+    reply = "Redirecting to post job.";
+  } 
+
+  // =======================
+  // 🎯 HELP
+  // =======================
+  else if (msg.includes("apply")) {
+    reply = "Click 'View Details' → Apply Now.";
+  }
+
+  // =======================
+  // 💬 UPDATE CHAT
+  // =======================
+  setMessages(prev => [
+    ...prev,
+    { text: input, sender: "user" },
+    { text: reply, sender: "bot" }
+  ]);
+};
 const handleLogin = (email: string, pass: string) => {
   const users = JSON.parse(localStorage.getItem('jc_users') || '[]');
   const user = users.find((u: any) => u.email === email && u.password === pass);
@@ -1353,6 +1444,56 @@ const viewApplicants = (job: Job) => {
           </div>
         </div>
       </footer>
+      {/* ================= CHATBOT UI ================= */}
+<div className="fixed bottom-6 right-6 z-50">
+
+  {/* Button */}
+  <button
+    onClick={() => setShowChat(!showChat)}
+    className="bg-gradient-to-r from-indigo-600 to-purple-500 text-white p-4 rounded-full shadow-lg hover:scale-110 transition"
+  >
+    💬
+  </button>
+
+  {/* Chat Box */}
+  {showChat && (
+    <div className="mt-3 w-80 bg-white rounded-2xl shadow-2xl border p-4">
+
+      {/* Messages */}
+      <div className="h-60 overflow-y-auto space-y-2 mb-3">
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={`text-sm p-2 rounded-lg ${
+              m.sender === "user"
+                ? "bg-indigo-100 text-right"
+                : "bg-gray-100"
+            }`}
+          >
+            {m.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const input = e.target as any;
+          handleChat(input.msg.value);
+          input.msg.value = "";
+        }}
+      >
+        <input
+          name="msg"
+          placeholder="Ask something..."
+          className="w-full border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </form>
+
+    </div>
+  )}
+</div>
     </div>
   );
 }
