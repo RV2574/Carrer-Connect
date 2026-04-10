@@ -23,6 +23,109 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+const ROADMAPS = [
+  {
+    category: "Frontend",
+    items: [
+      { title: "Frontend", link: "https://roadmap.sh/frontend" },
+      { title: "React", link: "https://roadmap.sh/react" },
+      { title: "Vue", link: "https://roadmap.sh/vue" },
+      { title: "Angular", link: "https://roadmap.sh/angular" },
+      { title: "JavaScript", link: "https://roadmap.sh/javascript" },
+      { title: "TypeScript", link: "https://roadmap.sh/typescript" },
+      { title: "Next.js", link: "https://roadmap.sh/nextjs" },
+      { title: "HTML", link: "https://roadmap.sh/html" },
+      { title: "CSS", link: "https://roadmap.sh/css" }
+    ]
+  },
+
+  {
+    category: "Backend",
+    items: [
+      { title: "Backend", link: "https://roadmap.sh/backend" },
+      { title: "Node.js", link: "https://roadmap.sh/nodejs" },
+      { title: "Java", link: "https://roadmap.sh/java" },
+      { title: "Spring Boot", link: "https://roadmap.sh/spring-boot" },
+      { title: "ASP.NET Core", link: "https://roadmap.sh/aspnet-core" },
+      { title: "Django", link: "https://roadmap.sh/django" },
+      { title: "Laravel", link: "https://roadmap.sh/laravel" },
+      { title: "Ruby on Rails", link: "https://roadmap.sh/ruby-on-rails" },
+      { title: "PHP", link: "https://roadmap.sh/php" }
+    ]
+  },
+
+  {
+    category: "DevOps & Cloud",
+    items: [
+      { title: "Docker", link: "https://roadmap.sh/docker" },
+      { title: "Kubernetes", link: "https://roadmap.sh/kubernetes" },
+      { title: "AWS", link: "https://roadmap.sh/aws" },
+      { title: "Terraform", link: "https://roadmap.sh/terraform" },
+      { title: "Linux", link: "https://roadmap.sh/linux" },
+      { title: "Cloudflare", link: "https://roadmap.sh/cloudflare" }
+    ]
+  },
+
+  {
+    category: "Programming Languages",
+    items: [
+      { title: "Python", link: "https://roadmap.sh/python" },
+      { title: "C++", link: "https://roadmap.sh/cpp" },
+      { title: "Go", link: "https://roadmap.sh/golang" },
+      { title: "Rust", link: "https://roadmap.sh/rust" },
+      { title: "Kotlin", link: "https://roadmap.sh/kotlin" },
+      { title: "Swift", link: "https://roadmap.sh/swift" },
+      { title: "Scala", link: "https://roadmap.sh/scala" },
+      { title: "Ruby", link: "https://roadmap.sh/ruby" }
+    ]
+  },
+
+  {
+    category: "Data & CS",
+    items: [
+      { title: "SQL", link: "https://roadmap.sh/sql" },
+      { title: "MongoDB", link: "https://roadmap.sh/mongodb" },
+      { title: "Redis", link: "https://roadmap.sh/redis" },
+      { title: "Computer Science", link: "https://roadmap.sh/computer-science" },
+      { title: "System Design", link: "https://roadmap.sh/system-design" },
+      { title: "DSA", link: "https://roadmap.sh/dsa" }
+    ]
+  },
+
+  {
+    category: "Mobile Development",
+    items: [
+      { title: "Flutter", link: "https://roadmap.sh/flutter" },
+      { title: "React Native", link: "https://roadmap.sh/react-native" },
+      { title: "Android", link: "https://roadmap.sh/android" }
+    ]
+  },
+
+  {
+    category: "Other Skills",
+    items: [
+      { title: "Git & GitHub", link: "https://roadmap.sh/git-github" },
+      { title: "API Design", link: "https://roadmap.sh/api-design" },
+      { title: "GraphQL", link: "https://roadmap.sh/graphql" },
+      { title: "Design System", link: "https://roadmap.sh/design-system" },
+      { title: "Code Review", link: "https://roadmap.sh/code-review" },
+      { title: "Shell/Bash", link: "https://roadmap.sh/bash" },
+      { title: "Elasticsearch", link: "https://roadmap.sh/elasticsearch" }
+    ]
+  },
+
+  {
+    category: "AI & Future",
+    items: [
+      { title: "Prompt Engineering", link: "https://roadmap.sh/prompt-engineering" },
+      { title: "AI Agents", link: "https://roadmap.sh/ai-agents" },
+      { title: "AI Red Teaming", link: "https://roadmap.sh/ai-red-teaming" },
+      { title: "Vibe Coding", link: "https://roadmap.sh/vibe-coding" },
+      { title: "Claude Code", link: "https://roadmap.sh/claude-code" }
+    ]
+  }
+];
+
 // --- Types ---
 type UserRole = 'seeker' | 'lister' | 'admin';
 
@@ -276,6 +379,558 @@ const INITIAL_JOBS: Job[] = [
   description: 'Investigate criminal cases and maintain law enforcement.',
   listerId: 'admin',
   postedAt: new Date().toISOString()
+},
+{
+  id: '21',
+  title: 'Sales Executive',
+  company: 'Reliance Retail',
+  location: 'Mumbai, India',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Drive in-store sales and manage customer relations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '22',
+  title: 'HR Recruiter',
+  company: 'Randstad',
+  location: 'Gurgaon, India',
+  salary: '₹4L - ₹7L',
+  type: 'Private',
+  description: 'Source and screen candidates for client roles.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '23',
+  title: 'Accountant',
+  company: 'KPMG',
+  location: 'Delhi, India',
+  salary: '₹5L - ₹9L',
+  type: 'Private',
+  description: 'Handle financial statements and audits.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '24',
+  title: 'Mechanical Engineer',
+  company: 'L&T',
+  location: 'Chennai, India',
+  salary: '₹6L - ₹10L',
+  type: 'Private',
+  description: 'Design and maintain mechanical systems.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '25',
+  title: 'Civil Engineer',
+  company: 'Shapoorji Pallonji',
+  location: 'Kolkata, India',
+  salary: '₹5L - ₹9L',
+  type: 'Private',
+  description: 'Oversee construction projects and site operations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '26',
+  title: 'Pharmacist',
+  company: 'Apollo Pharmacy',
+  location: 'Hyderabad, India',
+  salary: '₹3L - ₹5L',
+  type: 'Private',
+  description: 'Dispense medicines and advise customers.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '27',
+  title: 'Hotel Manager',
+  company: 'Taj Hotels',
+  location: 'Goa, India',
+  salary: '₹8L - ₹14L',
+  type: 'Private',
+  description: 'Manage hotel operations and guest experience.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '28',
+  title: 'Chef',
+  company: 'ITC Hotels',
+  location: 'Bangalore, India',
+  salary: '₹4L - ₹8L',
+  type: 'Private',
+  description: 'Prepare cuisine and manage kitchen staff.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '29',
+  title: 'Journalist',
+  company: 'Times Group',
+  location: 'Delhi, India',
+  salary: '₹4L - ₹7L',
+  type: 'Private',
+  description: 'Report news and create editorial content.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '30',
+  title: 'Photographer',
+  company: 'Wedding Bells',
+  location: 'Jaipur, India',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Shoot and edit event photographs.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '31',
+  title: 'Fitness Trainer',
+  company: 'Gold’s Gym',
+  location: 'Pune, India',
+  salary: '₹2.5L - ₹5L',
+  type: 'Private',
+  description: 'Train clients and design fitness plans.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '32',
+  title: 'Retail Store Manager',
+  company: 'Pantaloons',
+  location: 'Ahmedabad, India',
+  salary: '₹5L - ₹8L',
+  type: 'Private',
+  description: 'Manage store operations and sales team.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '33',
+  title: 'Content Writer',
+  company: 'Pepper Content',
+  location: 'Remote',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Write blogs, SEO content, and articles.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '34',
+  title: 'Customer Support Executive',
+  company: 'Teleperformance',
+  location: 'Noida, India',
+  salary: '₹2.5L - ₹4.5L',
+  type: 'Private',
+  description: 'Handle customer queries via calls and chat.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '35',
+  title: 'Electrician',
+  company: 'Urban Company',
+  location: 'Delhi, India',
+  salary: '₹2L - ₹4L',
+  type: 'Private',
+  description: 'Perform residential electrical repairs.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '36',
+  title: 'Delivery Executive',
+  company: 'Zomato',
+  location: 'Lucknow, India',
+  salary: '₹2L - ₹3.5L',
+  type: 'Private',
+  description: 'Deliver orders and manage routes.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '37',
+  title: 'Driver',
+  company: 'Ola',
+  location: 'Mumbai, India',
+  salary: '₹2.5L - ₹5L',
+  type: 'Private',
+  description: 'Provide ride-hailing services.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '38',
+  title: 'Teacher (Private School)',
+  company: 'Delhi Public School',
+  location: 'Indore, India',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Teach secondary school subjects.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '39',
+  title: 'Nurse',
+  company: 'Fortis Hospital',
+  location: 'Chandigarh, India',
+  salary: '₹3L - ₹5L',
+  type: 'Private',
+  description: 'Assist doctors and care for patients.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '40',
+  title: 'Lab Technician',
+  company: 'SRL Diagnostics',
+  location: 'Bhopal, India',
+  salary: '₹2.5L - ₹4L',
+  type: 'Private',
+  description: 'Conduct lab tests and maintain equipment.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '41',
+  title: 'Warehouse Supervisor',
+  company: 'Flipkart Logistics',
+  location: 'Patna, India',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Oversee warehouse operations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '42',
+  title: 'Field Sales Officer',
+  company: 'HUL',
+  location: 'Kanpur, India',
+  salary: '₹4L - ₹7L',
+  type: 'Private',
+  description: 'Expand market reach and sales.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '43',
+  title: 'Insurance Advisor',
+  company: 'LIC (Agency)',
+  location: 'Ranchi, India',
+  salary: '₹2L - ₹6L',
+  type: 'Private',
+  description: 'Sell insurance policies and advise clients.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '44',
+  title: 'Event Coordinator',
+  company: 'Eventify',
+  location: 'Jaipur, India',
+  salary: '₹3L - ₹6L',
+  type: 'Private',
+  description: 'Plan and execute events.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '45',
+  title: 'Real Estate Agent',
+  company: 'MagicBricks',
+  location: 'Gurgaon, India',
+  salary: '₹3L - ₹8L',
+  type: 'Private',
+  description: 'Manage property listings and client deals.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+
+// ----------- GOVERNMENT (46–70) -----------
+{
+  id: '46',
+  title: 'Railway Clerk',
+  company: 'Indian Railways',
+  location: 'Delhi, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Clerical railway operations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '47',
+  title: 'Police Constable',
+  company: 'UP Police',
+  location: 'Lucknow, India',
+  salary: '₹3L - ₹4.5L',
+  type: 'Government',
+  description: 'Maintain law and order.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '48',
+  title: 'Teacher',
+  company: 'Gov School',
+  location: 'Jaipur, India',
+  salary: '₹3L - ₹6L',
+  type: 'Government',
+  description: 'Teach students.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '49',
+  title: 'Bank PO',
+  company: 'SBI',
+  location: 'Patna, India',
+  salary: '₹6L - ₹10L',
+  type: 'Government',
+  description: 'Bank operations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '50',
+  title: 'Forest Guard',
+  company: 'Forest Department',
+  location: 'Dehradun, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Protect forest resources.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '51',
+  title: 'Municipal Officer',
+  company: 'Municipal Corporation',
+  location: 'Ahmedabad, India',
+  salary: '₹5L - ₹8L',
+  type: 'Government',
+  description: 'Manage city administration.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '52',
+  title: 'Postal Assistant',
+  company: 'India Post',
+  location: 'Kolkata, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Handle postal services.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '53',
+  title: 'Revenue Officer',
+  company: 'State Revenue Dept',
+  location: 'Chennai, India',
+  salary: '₹6L - ₹9L',
+  type: 'Government',
+  description: 'Manage land and revenue records.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '54',
+  title: 'Sub Inspector',
+  company: 'Delhi Police',
+  location: 'Delhi, India',
+  salary: '₹6L - ₹8L',
+  type: 'Government',
+  description: 'Investigate criminal cases.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '55',
+  title: 'Nurse',
+  company: 'AIIMS',
+  location: 'Bhopal, India',
+  salary: '₹4L - ₹7L',
+  type: 'Government',
+  description: 'Assist in patient care.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '56',
+  title: 'Junior Engineer',
+  company: 'PWD',
+  location: 'Lucknow, India',
+  salary: '₹5L - ₹9L',
+  type: 'Government',
+  description: 'Oversee public works.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '57',
+  title: 'Agriculture Officer',
+  company: 'Agri Dept',
+  location: 'Nagpur, India',
+  salary: '₹5L - ₹8L',
+  type: 'Government',
+  description: 'Support farmers and schemes.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '58',
+  title: 'Clerk',
+  company: 'District Court',
+  location: 'Indore, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Handle court documentation.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '59',
+  title: 'Fireman',
+  company: 'Fire Department',
+  location: 'Surat, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Emergency fire services.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '60',
+  title: 'Tax Assistant',
+  company: 'Income Tax Dept',
+  location: 'Pune, India',
+  salary: '₹4L - ₹7L',
+  type: 'Government',
+  description: 'Assist in tax processing.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '61',
+  title: 'Librarian',
+  company: 'Gov Library',
+  location: 'Varanasi, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Manage library resources.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '62',
+  title: 'Transport Inspector',
+  company: 'RTO',
+  location: 'Bangalore, India',
+  salary: '₹5L - ₹8L',
+  type: 'Government',
+  description: 'Vehicle inspection and regulation.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '63',
+  title: 'Health Inspector',
+  company: 'Health Dept',
+  location: 'Kochi, India',
+  salary: '₹4L - ₹7L',
+  type: 'Government',
+  description: 'Ensure public health standards.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '64',
+  title: 'Village Development Officer',
+  company: 'Rural Dev Dept',
+  location: 'Alwar, India',
+  salary: '₹4L - ₹6L',
+  type: 'Government',
+  description: 'Implement rural schemes.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '65',
+  title: 'Electricity Board Technician',
+  company: 'State Electricity Board',
+  location: 'Raipur, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Maintain electrical infrastructure.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '66',
+  title: 'Water Supply Officer',
+  company: 'Jal Board',
+  location: 'Delhi, India',
+  salary: '₹5L - ₹8L',
+  type: 'Government',
+  description: 'Manage water distribution.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '67',
+  title: 'Metro Staff',
+  company: 'DMRC',
+  location: 'Delhi, India',
+  salary: '₹3L - ₹6L',
+  type: 'Government',
+  description: 'Assist metro operations.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '68',
+  title: 'Court Assistant',
+  company: 'High Court',
+  location: 'Chandigarh, India',
+  salary: '₹4L - ₹6L',
+  type: 'Government',
+  description: 'Support judicial processes.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '69',
+  title: 'Fisheries Officer',
+  company: 'Fisheries Dept',
+  location: 'Visakhapatnam, India',
+  salary: '₹5L - ₹7L',
+  type: 'Government',
+  description: 'Promote fisheries sector.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
+},
+{
+  id: '70',
+  title: 'Postal Officer',
+  company: 'India Post',
+  location: 'Chandigarh, India',
+  salary: '₹3L - ₹5L',
+  type: 'Government',
+  description: 'Manage postal services.',
+  listerId: 'admin',
+  postedAt: new Date().toISOString()
 }
 ];
 
@@ -379,7 +1034,9 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
 // --- Main Component ---
 export default function App() {
   // --- State ---
- const [view, setView] = useState<'home' | 'login' | 'signup' | 'dashboard' | 'post-job' | 'job-details' | 'applicants' | 'about'>('home');
+ const [view, setView] = useState<
+  'home' | 'login' | 'signup' | 'dashboard' | 'post-job' | 'job-details' | 'applicants' | 'about' | 'roadmaps'
+>('home');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -397,43 +1054,33 @@ export default function App() {
 ]);
 
   // --- Persistence ---
-  useEffect(() => {
-    const storedJobs = localStorage.getItem('jc_jobs');
-    const storedApps = localStorage.getItem('jc_apps');
-    const storedSaved = localStorage.getItem('jc_saved');
-    const storedUser = localStorage.getItem('jc_current_user');
+useEffect(() => {
+  const storedJobs = localStorage.getItem('jc_jobs');
+  const storedApps = localStorage.getItem('jc_apps');
+  const storedSaved = localStorage.getItem('jc_saved');
+  const storedUser = localStorage.getItem('jc_current_user');
 
-    if (!storedJobs) {
+  if (storedJobs) {
+    const parsedJobs = JSON.parse(storedJobs);
+
+    // 🔥 KEY FIX: if old data (less than 70), reset it
+    if (parsedJobs.length < INITIAL_JOBS.length) {
       localStorage.setItem('jc_jobs', JSON.stringify(INITIAL_JOBS));
       setJobs(INITIAL_JOBS);
     } else {
-      setJobs(JSON.parse(storedJobs));
+      setJobs(parsedJobs);
     }
 
-    if (storedApps) setApplications(JSON.parse(storedApps));
-    if (storedSaved) setSavedJobs(JSON.parse(storedSaved));
-    if (storedUser) setCurrentUser(JSON.parse(storedUser));
-  }, []);
+  } else {
+    localStorage.setItem('jc_jobs', JSON.stringify(INITIAL_JOBS));
+    setJobs(INITIAL_JOBS);
+  }
 
-  useEffect(() => {
-    if (jobs.length > 0) localStorage.setItem('jc_jobs', JSON.stringify(jobs));
-  }, [jobs]);
+  if (storedApps) setApplications(JSON.parse(storedApps));
+  if (storedSaved) setSavedJobs(JSON.parse(storedSaved));
+  if (storedUser) setCurrentUser(JSON.parse(storedUser));
 
-  useEffect(() => {
-    localStorage.setItem('jc_apps', JSON.stringify(applications));
-  }, [applications]);
-
-  useEffect(() => {
-    localStorage.setItem('jc_saved', JSON.stringify(savedJobs));
-  }, [savedJobs]);
-
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('jc_current_user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('jc_current_user');
-    }
-  }, [currentUser]);
+}, []);
 
   // --- Derived State ---
   const filteredJobs = useMemo(() => {
@@ -456,20 +1103,75 @@ const handleChat = (input: string) => {
   let reply = "Sorry, I didn't understand.";
 
   // 🔍 JOB ROLE DETECTION
-  const jobRoles = [
-    "software engineer",
-    "developer",
-    "frontend",
-    "backend",
-    "full stack",
-    "designer",
-    "data scientist",
-    "accountant",
-    "teacher",
-    "clerk",
-    "police",
-    "marketing"
-  ];
+const jobRoles = [
+  // TECH
+  "software engineer",
+  "frontend developer",
+  "backend developer",
+  "full stack developer",
+  "data analyst",
+  "data scientist",
+  "cloud engineer",
+  "devops engineer",
+  "qa engineer",
+
+  // BUSINESS / CORPORATE
+  "accountant",
+  "hr recruiter",
+  "sales executive",
+  "marketing",
+  "product manager",
+  "customer support",
+  "insurance advisor",
+
+  // DESIGN / CONTENT
+  "designer",
+  "ui ux designer",
+  "graphic designer",
+  "content writer",
+  "photographer",
+
+  // HEALTHCARE
+  "nurse",
+  "pharmacist",
+  "lab technician",
+
+  // EDUCATION
+  "teacher",
+
+  // FIELD / SERVICE
+  "driver",
+  "delivery executive",
+  "electrician",
+  "fitness trainer",
+
+  // MANAGEMENT
+  "store manager",
+  "hotel manager",
+  "event coordinator",
+
+  // ENGINEERING NON-TECH
+  "mechanical engineer",
+  "civil engineer",
+
+  // GOVERNMENT
+  "clerk",
+  "police",
+  "constable",
+  "sub inspector",
+  "bank po",
+  "railway",
+  "forest guard",
+  "municipal officer",
+  "postal",
+  "revenue officer",
+  "tax assistant",
+  "fireman",
+  "librarian",
+  "transport inspector",
+  "health inspector",
+  "village development officer"
+];
 
   const matchedRole = jobRoles.find(role => msg.includes(role));
 
@@ -713,6 +1415,12 @@ const viewApplicants = (job: Job) => {
 >
   About
 </button>
+<button 
+  onClick={() => setView('roadmaps')} 
+  className={`text-sm font-medium ${view === 'roadmaps' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'}`}
+>
+  Roadmaps
+</button>
             {(currentUser?.role === 'lister' || currentUser?.role === 'admin') && (
               <button onClick={() => setView('post-job')} className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center">
                 <PlusCircle className="w-4 h-4 mr-2" />
@@ -860,6 +1568,7 @@ const viewApplicants = (job: Job) => {
     exit={{ opacity: 0 }}
     className="max-w-6xl mx-auto"
   >
+    
 
     {/* 🔥 HERO */}
     <div className="text-center mb-24 relative">
@@ -960,6 +1669,82 @@ const viewApplicants = (job: Job) => {
       >
         Explore Jobs
       </button>
+    </div>
+
+  </motion.div>
+)}
+
+// Roadmap 
+{view === 'roadmaps' && (
+  <motion.div
+    key="roadmaps"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    className="relative max-w-7xl mx-auto px-4 mt-12"
+  >
+
+    {/* 🔵 BACKGROUND */}
+    <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-blue-50 rounded-3xl"></div>
+
+    {/* 🔵 HERO */}
+    <div className="text-center mb-20">
+      <h1 className="text-5xl font-extrabold mb-4 text-gray-900">
+        Explore Your <span className="text-indigo-600">Career Roadmaps</span>
+      </h1>
+      <p className="text-gray-500 max-w-xl mx-auto">
+        Structured learning paths designed to help you grow faster.
+      </p>
+    </div>
+
+    {/* 🔵 CONTENT */}
+    <div className="space-y-16">
+      {ROADMAPS.map((section, index) => (
+        <div key={index}>
+
+          {/* CATEGORY */}
+          <h2 className="text-xl font-bold mb-6 text-gray-800">
+            {section.category}
+          </h2>
+
+          {/* CARDS */}
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {section.items.map((item, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -6 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => window.open(item.link, "_blank")}
+                className="cursor-pointer rounded-2xl p-[1px] bg-gradient-to-r from-indigo-200 via-blue-200 to-indigo-200"
+              >
+
+                {/* 🔥 GLASS CARD */}
+                <div className="bg-white/70 backdrop-blur-lg rounded-2xl p-6 h-full border border-white/50 shadow-sm 
+                                hover:shadow-xl hover:border-indigo-200 transition-all duration-300 group">
+
+                  {/* ICON */}
+                  <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 mb-4 group-hover:bg-indigo-100 transition">
+                    🧭
+                  </div>
+
+                  {/* TITLE */}
+                  <h3 className="font-semibold text-gray-900 text-lg group-hover:text-indigo-600 transition">
+                    {item.title}
+                  </h3>
+
+                  {/* SUBTEXT */}
+                  <p className="text-sm text-gray-500 mt-2">
+                    Click to view roadmap →
+                  </p>
+
+                </div>
+
+              </motion.div>
+            ))}
+          </div>
+
+        </div>
+      ))}
     </div>
 
   </motion.div>
