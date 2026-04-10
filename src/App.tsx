@@ -24,7 +24,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 
 // --- Types ---
-type UserRole = 'seeker' | 'lister';
+type UserRole = 'seeker' | 'lister' | 'admin';
 
 interface UserProfile {
   id: string;
@@ -280,7 +280,7 @@ const INITIAL_JOBS: Job[] = [
 ];
 
 // --- Components ---
-const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDetails, onViewApplicants }: { 
+const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDetails, onViewApplicants, onDelete, onEdit }: { 
   job: Job, 
   currentUser: UserProfile | null, 
   savedJobs: string[], 
@@ -288,6 +288,8 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
   onSave: (id: string) => void,
   onViewDetails: (job: Job) => void,
   onViewApplicants: (job: Job) => void,
+  onDelete: (id: string) => void,
+  onEdit: (job: Job) => void,
   key?: string | number
 }) => (
   <motion.div 
@@ -323,12 +325,15 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
     </div>
 
     <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+      
       <button 
         onClick={() => onViewDetails(job)}
         className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center"
       >
         View Details <ChevronRight className="w-4 h-4 ml-1" />
       </button>
+
+      {/* Seeker */}
       {currentUser?.role === 'seeker' && (
         <button 
           onClick={() => onSave(job.id)}
@@ -337,6 +342,8 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
           <Bookmark className={`w-5 h-5 ${savedJobs.includes(job.id) ? 'fill-current' : ''}`} />
         </button>
       )}
+
+      {/* Lister */}
       {currentUser?.role === 'lister' && currentUser.id === job.listerId && (
         <button 
           onClick={() => onViewApplicants(job)}
@@ -346,6 +353,25 @@ const JobCard = ({ job, currentUser, savedJobs, applications, onSave, onViewDeta
           Applicants ({applications.filter(a => a.jobId === job.id).length})
         </button>
       )}
+
+      {/* ✅ ADMIN CONTROLS */}
+      {currentUser?.role === 'admin' && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEdit(job)}
+            className="text-xs font-bold bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg hover:bg-yellow-200"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(job.id)}
+            className="text-xs font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-200"
+          >
+            Delete
+          </button>
+        </div>
+      )}
+
     </div>
   </motion.div>
 );
@@ -416,104 +442,163 @@ export default function App() {
     });
   }, [jobs, searchQuery, filterType, filterLocation]);
 
-  // --- Handlers ---
-  const handleLogin = (email: string, pass: string) => {
-    const users = JSON.parse(localStorage.getItem('jc_users') || '[]');
-    const user = users.find((u: any) => u.email === email && u.password === pass);
-    if (user) {
-      setCurrentUser({ id: user.id, name: user.name, email: user.email, role: user.role });
-      setView('home');
-    } else {
-      alert('Invalid credentials');
-    }
-  };
-
-  const handleSignup = (name: string, email: string, pass: string, role: UserRole) => {
-    const users = JSON.parse(localStorage.getItem('jc_users') || '[]');
-    if (users.find((u: any) => u.email === email)) {
-      alert('Email already exists');
-      return;
-    }
-    const newUser = { id: Date.now().toString(), name, email, password: pass, role };
-    users.push(newUser);
-    localStorage.setItem('jc_users', JSON.stringify(users));
-    setCurrentUser({ id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role });
+// --- Handlers ---
+const handleLogin = (email: string, pass: string) => {
+  const users = JSON.parse(localStorage.getItem('jc_users') || '[]');
+  const user = users.find((u: any) => u.email === email && u.password === pass);
+  if (user) {
+    setCurrentUser({ id: user.id, name: user.name, email: user.email, role: user.role });
+    setSelectedJob(null);
     setView('home');
+  } else {
+    alert('Invalid credentials');
+  }
+};
+
+const handleSignup = (name: string, email: string, pass: string, role: UserRole) => {
+  const users = JSON.parse(localStorage.getItem('jc_users') || '[]');
+  if (users.find((u: any) => u.email === email)) {
+    alert('Email already exists');
+    return;
+  }
+  const newUser = { id: Date.now().toString(), name, email, password: pass, role };
+  users.push(newUser);
+  localStorage.setItem('jc_users', JSON.stringify(users));
+  setCurrentUser({ id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role });
+  setSelectedJob(null);
+  setView('home');
+};
+
+const handleLogout = () => {
+  setCurrentUser(null);
+  setSelectedJob(null);
+  setView('home');
+};
+
+const handleApply = (job: Job) => {
+  if (!currentUser) {
+    setView('login');
+    return;
+  }
+  if (currentUser.role !== 'seeker') {
+    alert('Only job seekers can apply');
+    return;
+  }
+  if (applications.find(app => app.jobId === job.id && app.seekerId === currentUser.id)) {
+    alert('You have already applied for this job');
+    return;
+  }
+
+  const newApp: Application = {
+    id: Date.now().toString(),
+    jobId: job.id,
+    seekerId: currentUser.id,
+    seekerName: currentUser.name,
+    seekerEmail: currentUser.email,
+    jobTitle: job.title,
+    appliedAt: new Date().toISOString()
   };
 
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setView('home');
-  };
+  const updatedApps = [...applications, newApp];
+  setApplications(updatedApps);
+  localStorage.setItem('jc_apps', JSON.stringify(updatedApps));
+  alert('Application submitted successfully!');
+};
 
-  const handleApply = (job: Job) => {
-    if (!currentUser) {
-      setView('login');
-      return;
-    }
-    if (currentUser.role !== 'seeker') {
-      alert('Only job seekers can apply');
-      return;
-    }
-    if (applications.find(app => app.jobId === job.id && app.seekerId === currentUser.id)) {
-      alert('You have already applied for this job');
-      return;
-    }
-    const newApp: Application = {
-      id: Date.now().toString(),
-      jobId: job.id,
-      seekerId: currentUser.id,
-      seekerName: currentUser.name,
-      seekerEmail: currentUser.email,
-      jobTitle: job.title,
-      appliedAt: new Date().toISOString()
+const handleSave = (jobId: string) => {
+  if (!currentUser) {
+    setView('login');
+    return;
+  }
+  if (currentUser.role !== 'seeker') {
+    alert('Only job seekers can save jobs');
+    return;
+  }
+
+  const updatedSaved = savedJobs.includes(jobId)
+    ? savedJobs.filter(id => id !== jobId)
+    : [...savedJobs, jobId];
+
+  setSavedJobs(updatedSaved);
+  localStorage.setItem('jc_saved', JSON.stringify(updatedSaved));
+};
+
+
+
+// =======================
+// ✅ ADMIN HANDLERS
+// =======================
+
+const handleDeleteJob = (jobId: string) => {
+  if (!currentUser || currentUser.role !== 'admin') return;
+
+  const updatedJobs = jobs.filter(job => job.id !== jobId);
+  setJobs(updatedJobs);
+  localStorage.setItem('jc_jobs', JSON.stringify(updatedJobs));
+};
+
+const handleEditJob = (updatedJob: Job) => {
+  if (!currentUser || currentUser.role !== 'admin') return;
+
+  const updatedJobs = jobs.map(job =>
+    job.id === updatedJob.id ? updatedJob : job
+  );
+
+  setJobs(updatedJobs);
+  localStorage.setItem('jc_jobs', JSON.stringify(updatedJobs));
+};
+
+
+
+// =======================
+// ✅ POST JOB (CREATE + ADMIN EDIT)
+// =======================
+
+const handlePostJob = (jobData: Omit<Job, 'id' | 'listerId' | 'postedAt'>) => {
+  if (!currentUser) return;
+
+  // ADMIN EDIT MODE
+  if (selectedJob && currentUser.role === 'admin') {
+    const updatedJob: Job = {
+      ...selectedJob,
+      ...jobData
     };
-    const updatedApps = [...applications, newApp];
-    setApplications(updatedApps);
-    localStorage.setItem('jc_apps', JSON.stringify(updatedApps));
-    alert('Application submitted successfully!');
-  };
 
-  const handleSave = (jobId: string) => {
-    if (!currentUser) {
-      setView('login');
-      return;
-    }
-    if (currentUser.role !== 'seeker') {
-      alert('Only job seekers can save jobs');
-      return;
-    }
-    let updatedSaved;
-    if (savedJobs.includes(jobId)) {
-      updatedSaved = savedJobs.filter(id => id !== jobId);
-    } else {
-      updatedSaved = [...savedJobs, jobId];
-    }
-    setSavedJobs(updatedSaved);
-    localStorage.setItem('jc_saved', JSON.stringify(updatedSaved));
-  };
-
-  const handlePostJob = (jobData: Omit<Job, 'id' | 'listerId' | 'postedAt'>) => {
-    if (!currentUser || currentUser.role !== 'lister') return;
-    const newJob: Job = {
-      ...jobData,
-      id: Date.now().toString(),
-      listerId: currentUser.id,
-      postedAt: new Date().toISOString()
-    };
-    const updatedJobs = [newJob, ...jobs];
-    setJobs(updatedJobs);
-    localStorage.setItem('jc_jobs', JSON.stringify(updatedJobs));
+    handleEditJob(updatedJob);
+    setSelectedJob(null);
     setView('home');
+    return;
+  }
+
+  // LISTER CREATE MODE
+  if (currentUser.role !== 'lister') return;
+
+  const newJob: Job = {
+    ...jobData,
+    id: Date.now().toString(),
+    listerId: currentUser.id,
+    postedAt: new Date().toISOString()
   };
 
-  const viewApplicants = (job: Job) => {
-    const jobApps = applications.filter(app => app.jobId === job.id);
-    setSelectedJob(job);
-    setSelectedJobApplicants(jobApps);
-    setView('applicants');
-  };
+  const updatedJobs = [newJob, ...jobs];
+  setJobs(updatedJobs);
+  localStorage.setItem('jc_jobs', JSON.stringify(updatedJobs));
+  setSelectedJob(null);
+  setView('home');
+};
 
+
+
+// =======================
+// ✅ VIEW APPLICANTS (ONLY ONE)
+// =======================
+
+const viewApplicants = (job: Job) => {
+  const jobApps = applications.filter(app => app.jobId === job.id);
+  setSelectedJob(job);
+  setSelectedJobApplicants(jobApps);
+  setView('applicants');
+};
   // --- Components ---
   const Navbar = () => (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -531,7 +616,7 @@ export default function App() {
             {currentUser && (
               <button onClick={() => setView('dashboard')} className={`text-sm font-medium ${view === 'dashboard' ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'}`}>Dashboard</button>
             )}
-            {currentUser?.role === 'lister' && (
+            {(currentUser?.role === 'lister' || currentUser?.role === 'admin') && (
               <button onClick={() => setView('post-job')} className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center">
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Post a Job
@@ -642,16 +727,21 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredJobs.length > 0 ? (
                   filteredJobs.map(job => (
-                    <JobCard 
-                      key={job.id} 
-                      job={job} 
-                      currentUser={currentUser}
-                      savedJobs={savedJobs}
-                      applications={applications}
-                      onSave={handleSave}
-                      onViewDetails={(j) => { setSelectedJob(j); setView('job-details'); }}
-                      onViewApplicants={viewApplicants}
-                    />
+<JobCard 
+  key={job.id} 
+  job={job} 
+  currentUser={currentUser}
+  savedJobs={savedJobs}
+  applications={applications}
+  onSave={handleSave}
+  onViewDetails={(j) => { setSelectedJob(j); setView('job-details'); }}
+  onViewApplicants={viewApplicants}
+  onDelete={handleDeleteJob}
+  onEdit={(job) => {
+    setSelectedJob(job);
+    setView('post-job');
+  }}
+/>
                   ))
                 ) : (
                   <div className="col-span-full py-20 text-center">
@@ -948,19 +1038,30 @@ export default function App() {
                     </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {jobs.filter(j => j.listerId === currentUser.id).map(job => (
+                   {(currentUser.role === 'admin'
+                      ? jobs
+                      : jobs.filter(j => j.listerId === currentUser.id)
+                      ).map(job => (
                       <JobCard 
-                        key={job.id} 
-                        job={job} 
-                        currentUser={currentUser}
-                        savedJobs={savedJobs}
-                        applications={applications}
-                        onSave={handleSave}
-                        onViewDetails={(j) => { setSelectedJob(j); setView('job-details'); }}
-                        onViewApplicants={viewApplicants}
-                      />
+                       key={job.id} 
+                       job={job} 
+                       currentUser={currentUser}
+                       savedJobs={savedJobs}
+                       applications={applications}
+                       onSave={handleSave}
+                       onViewDetails={(j) => { setSelectedJob(j); setView('job-details'); }}
+                       onViewApplicants={viewApplicants}
+                       onDelete={handleDeleteJob}
+                       onEdit={(job) => {
+                       setSelectedJob(job);
+                       setView('post-job');
+                       }}
+                       />
                     ))}
-                    {jobs.filter(j => j.listerId === currentUser.id).length === 0 && (
+                    {(currentUser.role === 'admin'
+  ? jobs.length === 0
+  : jobs.filter(j => j.listerId === currentUser.id).length === 0
+) && (
                       <div className="col-span-full bg-white border-2 border-dashed border-gray-100 rounded-3xl py-20 text-center">
                         <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Briefcase className="text-gray-300" />
@@ -977,7 +1078,7 @@ export default function App() {
           )}
 
           {/* --- Post Job View --- */}
-          {view === 'post-job' && currentUser?.role === 'lister' && (
+          {view === 'post-job' && (currentUser?.role === 'lister' || currentUser?.role === 'admin') && (
             <motion.div 
               key="post-job"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1004,37 +1105,40 @@ export default function App() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Job Title</label>
-                        <input name="title" type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Software Engineer" />
+                        <input name="title" type="text" defaultValue={selectedJob?.title || ''} required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Software Engineer" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Company / Department</label>
-                        <input name="company" type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Google" />
+                        <input name="company" defaultValue={selectedJob?.company || ''}  type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Google" />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Location</label>
-                        <input name="location" type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Remote or City, State" />
+                        <input name="location" defaultValue={selectedJob?.location || ''} type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. Remote or City, State" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Salary Range</label>
-                        <input name="salary" type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. $100k - $120k" />
+                        <input name="salary" defaultValue={selectedJob?.salary || ''} type="text" required className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm" placeholder="e.g. $100k - $120k" />
                       </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Job Type</label>
-                      <select name="type" className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm bg-white">
+                      <select name="type" defaultValue={selectedJob?.type || 'Private'} className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm bg-white">
                         <option value="Private">Private</option>
                         <option value="Government">Government</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Job Description</label>
-                      <textarea name="description" required rows={6} className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm resize-none" placeholder="Describe the role, requirements, and benefits..."></textarea>
+                      <textarea name="description" defaultValue={selectedJob?.description || ''} required rows={6} className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm resize-none" placeholder="Describe the role, requirements, and benefits..."></textarea>
                     </div>
                     <div className="flex gap-4 pt-4">
-                      <button type="button" onClick={() => setView('dashboard')} className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">Cancel</button>
-                      <button type="submit" className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20">Post Job Opening</button>
+                      <button type="button" onClick={() => {
+  setSelectedJob(null);
+  setView('dashboard');
+}} className="flex-1 bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">Cancel</button>
+                      <button type="submit" className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20">{selectedJob ? 'Update Job' : 'Post Job Opening'}</button>
                     </div>
                   </div>
                 </form>
@@ -1051,7 +1155,10 @@ export default function App() {
               exit={{ opacity: 0, x: -20 }}
               className="max-w-4xl mx-auto"
             >
-              <button onClick={() => setView('dashboard')} className="flex items-center text-sm font-bold text-gray-500 hover:text-gray-900 mb-8 transition-colors">
+              <button onClick={() => {
+  setSelectedJob(null);
+  setView('dashboard');
+}} className="flex items-center text-sm font-bold text-gray-500 hover:text-gray-900 mb-8 transition-colors">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
               </button>
 
