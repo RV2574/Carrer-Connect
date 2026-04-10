@@ -2146,16 +2146,6 @@ const viewApplicants = (job: Job) => {
                         </div>
                         <h4 className="text-lg font-bold text-gray-900">No jobs posted yet</h4>
                         <p className="text-gray-400 text-sm mb-6">Start hiring by posting your first job opening.</p>
-
-
-  {/* ➕ POST JOB */}
-  <button 
-    onClick={() => setView('post-job')} 
-    className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center"
-  >
-    Post a Job
-  </button>
-
                       </div>
                     )}
                   </div>
