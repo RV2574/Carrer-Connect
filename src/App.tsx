@@ -1135,7 +1135,7 @@ const handleChat = (input: string) => {
     "hotel manager","event coordinator","mechanical engineer","civil engineer",
     "clerk","police","constable","sub inspector","bank po","railway","forest guard",
     "municipal officer","postal","revenue officer","tax assistant","fireman",
-    "librarian","transport inspector","health inspector","village development officer"
+    "librarian","transport inspector","health inspector","village development officer", "Chef", "Forest Officer"
   ];
 
   // =======================
@@ -2303,8 +2303,14 @@ const viewApplicants = (job: Job) => {
              <button onClick={() => setView('about')} className="hover:text-indigo-600 transition-colors">
   About Us
 </button>
-              <a href="#" className="hover:text-indigo-600 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-indigo-600 transition-colors">Terms of Service</a>
+<a
+  href="https://github.com/RV2574/Carrer-Connect"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hover:text-indigo-600 transition-colors"
+>
+GitHub
+</a>
 <a 
   href="https://mail.google.com/mail/?view=cm&fs=1&to=career.connect1001@gmail.com&su=Job Portal Query&body=Hello, I want to ask about..."
   target="_blank"
