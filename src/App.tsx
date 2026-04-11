@@ -1036,7 +1036,7 @@ export default function App() {
   // --- State ---
  const [view, setView] = useState<
   'home' | 'login' | 'signup' | 'dashboard' | 'post-job' | 'job-details' | 'applicants' | 'about' | 'roadmaps'
->('home');
+>('about');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
